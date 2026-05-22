@@ -1,7 +1,7 @@
 <nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
-            <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4 lg:gap-8">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                     <x-application-mark class="size-10" />
                     <span class="hidden text-base font-bold text-slate-950 sm:block">InfraWatch</span>
@@ -9,12 +9,25 @@
 
                 <div class="hidden items-center gap-1 sm:flex">
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        Dashboard
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('monitors.index') }}" :active="request()->routeIs('monitors.*')">
+                        Monitoramentos
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('incidents.index') }}" :active="request()->routeIs('incidents.*')">
+                        Incidentes
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('settings.alerts') }}" :active="request()->routeIs('settings.*')">
+                        Alertas
                     </x-nav-link>
                 </div>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:gap-4">
+                <a href="{{ route('monitors.create') }}" class="hidden rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 lg:inline-flex">
+                    Novo monitor
+                </a>
+
                 <div class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                     Sistema online
                 </div>
@@ -39,14 +52,18 @@
                         <div class="border-t border-slate-100"></div>
 
                         <x-dropdown-link href="{{ route('profile.show') }}">
-                            {{ __('Perfil') }}
+                            Perfil
+                        </x-dropdown-link>
+
+                        <x-dropdown-link href="{{ route('settings.alerts') }}">
+                            Canais de alerta
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}" x-data>
                             @csrf
 
                             <x-dropdown-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
-                                {{ __('Sair') }}
+                                Sair
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -67,7 +84,19 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden border-t border-slate-200 bg-white sm:hidden">
         <div class="space-y-1 px-2 pb-3 pt-2">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                Dashboard
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('monitors.index') }}" :active="request()->routeIs('monitors.*')">
+                Monitoramentos
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('incidents.index') }}" :active="request()->routeIs('incidents.*')">
+                Incidentes
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('settings.alerts') }}" :active="request()->routeIs('settings.*')">
+                Alertas
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('monitors.create') }}">
+                Novo monitor
             </x-responsive-nav-link>
         </div>
 
@@ -83,14 +112,14 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Perfil') }}
+                    Perfil
                 </x-responsive-nav-link>
 
                 <form method="POST" action="{{ route('logout') }}" x-data>
                     @csrf
 
                     <x-responsive-nav-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
-                        {{ __('Sair') }}
+                        Sair
                     </x-responsive-nav-link>
                 </form>
             </div>
