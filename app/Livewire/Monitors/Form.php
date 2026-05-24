@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Monitors;
 
+use App\Enums\MonitorStatus;
 use App\Models\Monitor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -39,7 +40,7 @@ class Form extends Component
         $this->type = $existing->type;
         $this->frequency = $existing->frequency;
         $this->timeout = $existing->timeout;
-        $this->isActive = $existing->status === 'active';
+        $this->isActive = $existing->isActive();
     }
 
     public function save(): void
@@ -47,7 +48,9 @@ class Form extends Component
         $validated = $this->validate();
 
         $validated['user_id'] = Auth::id();
-        $validated['status'] = $this->isActive ? 'active' : 'paused';
+        $validated['status'] = $this->isActive
+            ? MonitorStatus::Active
+            : MonitorStatus::Paused;
 
         if ($this->monitorId !== null) {
             $this->findMonitor((string) $this->monitorId)->update($validated);

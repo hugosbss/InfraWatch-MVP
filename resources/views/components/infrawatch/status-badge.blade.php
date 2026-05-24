@@ -1,6 +1,8 @@
 @props(['status'])
 
 @php
+    $status = $status instanceof \BackedEnum ? $status->value : $status;
+
     [$label, $classes] = match ($status) {
         'active' => ['ativo', 'bg-emerald-50 text-emerald-700'],
         'online' => ['online', 'bg-emerald-50 text-emerald-700'],

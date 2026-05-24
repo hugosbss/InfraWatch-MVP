@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\IncidentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->timestamp('ended_at')->nullable();
             $table->unsignedInteger('duration_seconds')->nullable();
             $table->text('error_message')->nullable();
-            $table->string('status', 20)->default('open');
+            $table->string('status', 20)->default(IncidentStatus::Open->value);
             $table->timestamps();
 
             $table->index(['monitor_id', 'status']);

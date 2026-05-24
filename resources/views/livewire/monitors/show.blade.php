@@ -19,13 +19,13 @@
                         Editar
                     </a>
                     <button type="button" wire:click="togglePause" class="inline-flex items-center justify-center rounded-lg bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-100">
-                        {{ $monitor->status === 'paused' ? 'Ativar monitor' : 'Pausar monitor' }}
+                        {{ $monitor->isPaused() ? 'Ativar monitor' : 'Pausar monitor' }}
                     </button>
                 </div>
             </div>
 
             <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <x-infrawatch.stat-card label="Status" :value="$monitor->status === 'active' ? 'Ativo' : 'Pausado'" />
+                <x-infrawatch.stat-card label="Status" :value="$monitor->status->label()" />
                 <x-infrawatch.stat-card label="Ultima resposta" :value="$latestLog?->response_time_ms ? $latestLog->response_time_ms.' ms' : '—'" />
                 <x-infrawatch.stat-card label="Ultimo check" :value="$latestLog?->checked_at?->format('d/m H:i') ?? '—'" />
                 <x-infrawatch.stat-card label="Incidentes" :value="(string) count($incidents)" :badge="count($incidents) > 0 ? 'historico' : 'nenhum'" />

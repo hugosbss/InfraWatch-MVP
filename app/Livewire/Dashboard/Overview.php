@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Enums\IncidentStatus;
 use App\Support\MonitoringDemoData;
 use Livewire\Component;
 
@@ -14,7 +15,7 @@ class Overview extends Component
         $checks = MonitoringDemoData::recentChecks();
 
         $onlineCount = collect($monitors)->where('status', 'online')->count();
-        $openIncidents = collect($incidents)->where('status', 'open')->count();
+        $openIncidents = collect($incidents)->where('status', IncidentStatus::Open->value)->count();
 
         return view('livewire.dashboard.overview', [
             'monitors' => $monitors,

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\MonitorStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,8 +27,44 @@ class Monitor extends Model
     protected function casts(): array
     {
         return [
+            'status' => MonitorStatus::class,
             'timeout' => 'integer',
         ];
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('status', MonitorStatus::Active->value);
+    }
+
+    public function scopeHttp(Builder $query): void
+    {
+        $query->where('type', 'http');
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === MonitorStatus::Active;
+    }
+
+    public function isPaused(): bool
+    {
+        return $this->status === MonitorStatus::Paused;
+    }
+
+    public function toggleStatus(): void
+    {
+        $this->update([
+            'status' => $this->isPaused()
+                ? MonitorStatus::Active
+                : MonitorStatus::Paused,
+        ]);
+    }
+
+    public function isDueForCheck(int $minute): bool
+    {
+        return $this->frequency === '1m'
+            || ($this->frequency === '5m' && $minute % 5 === 0);
     }
 
     public function user(): BelongsTo

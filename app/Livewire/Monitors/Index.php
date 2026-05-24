@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Monitors;
 
+use App\Enums\MonitorStatus;
 use App\Models\Monitor;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -16,11 +17,7 @@ class Index extends Component
 
     public function togglePause(int $monitorId): void
     {
-        $monitor = $this->findMonitor($monitorId);
-
-        $monitor->update([
-            'status' => $monitor->status === 'paused' ? 'active' : 'paused',
-        ]);
+        $this->findMonitor($monitorId)->toggleStatus();
     }
 
     public function delete(int $monitorId): void
@@ -39,7 +36,7 @@ class Index extends Component
                         ->orWhere('target', 'like', '%'.$this->search.'%');
                 });
             })
-            ->when($this->statusFilter !== 'all', fn ($query) => $query->where('status', $this->statusFilter))
+            ->when($this->hasStatusFilter(), fn ($query) => $query->where('status', $this->statusFilter))
             ->when($this->typeFilter !== 'all', fn ($query) => $query->where('type', $this->typeFilter))
             ->latest()
             ->get();
@@ -54,5 +51,10 @@ class Index extends Component
         return Monitor::query()
             ->where('user_id', Auth::id())
             ->findOrFail($monitorId);
+    }
+
+    private function hasStatusFilter(): bool
+    {
+        return in_array($this->statusFilter, MonitorStatus::values(), true);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\IncidentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +26,13 @@ class Incident extends Model
             'started_at' => 'datetime',
             'ended_at' => 'datetime',
             'duration_seconds' => 'integer',
+            'status' => IncidentStatus::class,
         ];
+    }
+
+    public function isOpen(): bool
+    {
+        return $this->status === IncidentStatus::Open;
     }
 
     public function monitor(): BelongsTo

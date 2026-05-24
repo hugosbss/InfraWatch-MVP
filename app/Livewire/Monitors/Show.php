@@ -8,38 +8,36 @@ use Livewire\Component;
 
 class Show extends Component
 {
-    public Monitor $monitor;
+    public Monitor $monitorModel;
 
     public string $activeTab = 'overview';
 
     public function togglePause(): void
     {
-        $this->monitor->update([
-            'status' => $this->monitor->status === 'paused' ? 'active' : 'paused',
-        ]);
-
-        $this->monitor->refresh();
+        $this->monitorModel->toggleStatus();
+        $this->monitorModel->refresh();
     }
 
     public function mount(string $monitor): void
     {
-        $this->monitor = Monitor::query()
+        $this->monitorModel = Monitor::query()
             ->where('user_id', Auth::id())
             ->findOrFail($monitor);
     }
 
     public function render()
     {
-        $checks = $this->monitor->logs()
+        $checks = $this->monitorModel->logs()
             ->latest('checked_at')
             ->limit(20)
             ->get();
 
-        $incidents = $this->monitor->incidents()
+        $incidents = $this->monitorModel->incidents()
             ->latest('started_at')
             ->get();
 
         return view('livewire.monitors.show', [
+            'monitor' => $this->monitorModel,
             'checks' => $checks,
             'incidents' => $incidents,
             'latestLog' => $checks->first(),

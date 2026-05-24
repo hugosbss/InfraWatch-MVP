@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\MonitorStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->string('type', 20);
             $table->string('frequency', 10);
             $table->unsignedSmallInteger('timeout');
-            $table->string('status', 20)->default('active');
+            $table->string('status', 20)->default(MonitorStatus::Active->value);
             $table->timestamps();
 
             $table->index(['user_id', 'status']);
