@@ -2,8 +2,8 @@
     <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
         <section class="grid gap-4 sm:grid-cols-3">
             <x-infrawatch.stat-card label="Incidentes abertos" :value="(string) $openCount" :badge="$openCount > 0 ? 'acao necessaria' : 'estavel'" :badge-tone="$openCount > 0 ? 'danger' : 'success'" />
-            <x-infrawatch.stat-card label="Resolvidos (demo)" value="2" badge="ultimos 7 dias" />
-            <x-infrawatch.stat-card label="Duracao media" value="7 min" hint="demonstracao" />
+            <x-infrawatch.stat-card label="Resolvidos" :value="(string) $resolvedLastWeek" badge="ultimos 7 dias" />
+            <x-infrawatch.stat-card label="Duracao media" :value="$averageDuration" hint="incidentes resolvidos" />
         </section>
 
         <div class="flex flex-wrap gap-2">
@@ -51,15 +51,15 @@
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($incidents as $incident)
                             <tr class="align-top hover:bg-slate-50/80">
-                                <td class="px-5 py-4 font-mono text-xs font-semibold text-slate-700">{{ $incident['id'] }}</td>
+                                <td class="px-5 py-4 font-mono text-xs font-semibold text-slate-700">#{{ $incident->id }}</td>
                                 <td class="px-5 py-4">
-                                    <p class="font-semibold text-slate-950">{{ $incident['monitor'] }}</p>
-                                    <p class="mt-0.5 text-xs text-slate-500">{{ $incident['target'] }}</p>
+                                    <p class="font-semibold text-slate-950">{{ $incident->monitor->name }}</p>
+                                    <p class="mt-0.5 text-xs text-slate-500">{{ $incident->monitor->target }}</p>
                                 </td>
-                                <td class="px-5 py-4"><x-infrawatch.status-badge :status="$incident['status']" /></td>
-                                <td class="px-5 py-4 text-slate-600">{{ $incident['started_at'] }}</td>
-                                <td class="px-5 py-4 text-slate-600">{{ $incident['duration'] }}</td>
-                                <td class="px-5 py-4 text-slate-600">{{ $incident['error'] }}</td>
+                                <td class="px-5 py-4"><x-infrawatch.status-badge :status="$incident->status" /></td>
+                                <td class="px-5 py-4 text-slate-600">{{ $incident->started_at->format('d/m/Y H:i') }}</td>
+                                <td class="px-5 py-4 text-slate-600">{{ $incident->durationLabel() }}</td>
+                                <td class="px-5 py-4 text-slate-600">{{ $incident->error_message ?? 'Falha detectada pelo monitor.' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -35,6 +35,37 @@ class Incident extends Model
         return $this->status === IncidentStatus::Open;
     }
 
+    public function durationInSeconds(): int
+    {
+        if ($this->duration_seconds !== null) {
+            return $this->duration_seconds;
+        }
+
+        return (int) $this->started_at->diffInSeconds($this->ended_at ?? now());
+    }
+
+    public function durationLabel(): string
+    {
+        $seconds = $this->durationInSeconds();
+
+        if ($seconds < 60) {
+            return "{$seconds}s";
+        }
+
+        $minutes = intdiv($seconds, 60);
+
+        if ($minutes < 60) {
+            return "{$minutes} min";
+        }
+
+        $hours = intdiv($minutes, 60);
+        $remainingMinutes = $minutes % 60;
+
+        return $remainingMinutes === 0
+            ? "{$hours}h"
+            : "{$hours}h {$remainingMinutes}min";
+    }
+
     public function monitor(): BelongsTo
     {
         return $this->belongsTo(Monitor::class);

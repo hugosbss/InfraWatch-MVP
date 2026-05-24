@@ -61,6 +61,19 @@ class Monitor extends Model
         ]);
     }
 
+    public function operationalStatus(): string
+    {
+        if ($this->isPaused()) {
+            return MonitorStatus::Paused->value;
+        }
+
+        return match ($this->latestLog?->is_up) {
+            true => 'online',
+            false => 'offline',
+            default => MonitorStatus::Active->value,
+        };
+    }
+
     public function isDueForCheck(int $minute): bool
     {
         return $this->frequency === '1m'

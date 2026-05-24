@@ -4,7 +4,7 @@
             <x-infrawatch.stat-card label="Uptime medio" :value="$stats['uptime']" badge="estavel" badge-tone="success" />
             <x-infrawatch.stat-card label="Monitoramentos" :value="$stats['monitors']" :hint="$stats['online'].' online'" />
             <x-infrawatch.stat-card label="Incidentes abertos" :value="$stats['incidents']" :badge="$stats['incidents'] > 0 ? 'atencao' : 'limpo'" :badge-tone="$stats['incidents'] > 0 ? 'danger' : 'neutral'" />
-            <x-infrawatch.stat-card label="Latencia media" :value="$stats['latency']" hint="demo" />
+            <x-infrawatch.stat-card label="Latencia media" :value="$stats['latency']" hint="checks reais" />
         </section>
 
         <section class="grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
@@ -30,17 +30,21 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @foreach ($monitors as $monitor)
+                            @forelse ($monitors as $monitor)
                                 <tr class="hover:bg-slate-50/80">
                                     <td class="px-5 py-4">
-                                        <a href="{{ route('monitors.show', $monitor['id']) }}" class="font-semibold text-slate-900 hover:text-teal-700">{{ $monitor['name'] }}</a>
-                                        <p class="mt-0.5 truncate text-xs text-slate-500">{{ $monitor['target'] }}</p>
+                                        <a href="{{ route('monitors.show', $monitor) }}" class="font-semibold text-slate-900 hover:text-teal-700">{{ $monitor->name }}</a>
+                                        <p class="mt-0.5 truncate text-xs text-slate-500">{{ $monitor->target }}</p>
                                     </td>
-                                    <td class="px-5 py-4"><x-infrawatch.status-badge :status="$monitor['status']" /></td>
-                                    <td class="px-5 py-4 text-slate-600">{{ $monitor['response_ms'] ? $monitor['response_ms'].' ms' : '—' }}</td>
-                                    <td class="px-5 py-4 text-slate-500">{{ $monitor['last_check'] }}</td>
+                                    <td class="px-5 py-4"><x-infrawatch.status-badge :status="$monitor->operationalStatus()" /></td>
+                                    <td class="px-5 py-4 text-slate-600">{{ $monitor->latestLog?->response_time_ms ? $monitor->latestLog->response_time_ms.' ms' : '—' }}</td>
+                                    <td class="px-5 py-4 text-slate-500">{{ $monitor->latestLog?->checked_at?->format('d/m H:i') ?? '—' }}</td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-5 py-8 text-center text-slate-500">Nenhum monitor cadastrado ainda.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -58,12 +62,12 @@
                             <div class="rounded-lg border border-slate-200 p-4">
                                 <div class="flex items-start justify-between gap-2">
                                     <div class="min-w-0">
-                                        <p class="font-semibold text-slate-950">{{ $incident['monitor'] }}</p>
-                                        <p class="mt-1 text-xs text-slate-500">{{ $incident['started_at'] }} · {{ $incident['duration'] }}</p>
+                                        <p class="font-semibold text-slate-950">{{ $incident->monitor->name }}</p>
+                                        <p class="mt-1 text-xs text-slate-500">{{ $incident->started_at->format('d/m H:i') }} · {{ $incident->durationLabel() }}</p>
                                     </div>
-                                    <x-infrawatch.status-badge :status="$incident['status']" />
+                                    <x-infrawatch.status-badge :status="$incident->status" />
                                 </div>
-                                <p class="mt-2 text-sm text-slate-600">{{ $incident['error'] }}</p>
+                                <p class="mt-2 text-sm text-slate-600">{{ $incident->error_message ?? 'Falha detectada pelo monitor.' }}</p>
                             </div>
                         @empty
                             <p class="text-sm text-slate-500">Nenhum incidente registrado.</p>
@@ -75,12 +79,14 @@
                 <div class="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white shadow-sm">
                     <h2 class="text-lg font-bold">Checks recentes</h2>
                     <ul class="mt-4 space-y-3">
-                        @foreach ($checks as $check)
+                        @forelse ($checks as $check)
                             <li class="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2 text-sm">
-                                <span>{{ $check['monitor'] }}</span>
-                                <span class="font-semibold text-teal-300">{{ $check['ms'] ? $check['ms'].' ms' : 'falha' }}</span>
+                                <span>{{ $check->monitor->name }}</span>
+                                <span class="font-semibold text-teal-300">{{ $check->is_up ? ($check->response_time_ms ? $check->response_time_ms.' ms' : 'online') : 'falha' }}</span>
                             </li>
-                        @endforeach
+                        @empty
+                            <li class="rounded-lg bg-white/10 px-3 py-2 text-sm text-slate-300">Nenhum check registrado.</li>
+                        @endforelse
                     </ul>
                 </div>
             </aside>
