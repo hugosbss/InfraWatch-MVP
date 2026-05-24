@@ -2,39 +2,47 @@
 
 namespace App\Livewire\Monitors;
 
-use App\Support\MonitoringDemoData;
+use App\Models\Monitor;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Show extends Component
 {
-    public array $monitor;
+    public Monitor $monitor;
 
     public string $activeTab = 'overview';
 
+    public function togglePause(): void
+    {
+        $this->monitor->update([
+            'status' => $this->monitor->status === 'paused' ? 'active' : 'paused',
+        ]);
+
+        $this->monitor->refresh();
+    }
+
     public function mount(string $monitor): void
     {
-        $data = MonitoringDemoData::findMonitor($monitor);
-
-        if ($data === null) {
-            abort(404);
-        }
-
-        $this->monitor = $data;
+        $this->monitor = Monitor::query()
+            ->where('user_id', Auth::id())
+            ->findOrFail($monitor);
     }
 
     public function render()
     {
+        $checks = $this->monitor->logs()
+            ->latest('checked_at')
+            ->limit(20)
+            ->get();
+
+        $incidents = $this->monitor->incidents()
+            ->latest('started_at')
+            ->get();
+
         return view('livewire.monitors.show', [
-            'checks' => [
-                ['at' => '14:35', 'status' => $this->monitor['status'], 'code' => 200, 'ms' => $this->monitor['response_ms'] ?? null],
-                ['at' => '14:34', 'status' => 'online', 'code' => 200, 'ms' => 156],
-                ['at' => '14:33', 'status' => 'online', 'code' => 200, 'ms' => 149],
-                ['at' => '14:32', 'status' => 'degraded', 'code' => 200, 'ms' => 812],
-            ],
-            'incidents' => collect(MonitoringDemoData::incidents())
-                ->filter(fn (array $incident) => $incident['monitor'] === $this->monitor['name'])
-                ->values()
-                ->all(),
+            'checks' => $checks,
+            'incidents' => $incidents,
+            'latestLog' => $checks->first(),
         ]);
     }
 }

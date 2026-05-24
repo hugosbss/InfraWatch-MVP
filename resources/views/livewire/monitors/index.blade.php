@@ -14,14 +14,11 @@
                 </div>
                 <select wire:model.live="statusFilter" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
                     <option value="all">Todos os status</option>
-                    <option value="online">Online</option>
-                    <option value="offline">Offline</option>
-                    <option value="degraded">Degradado</option>
+                    <option value="active">Ativo</option>
                     <option value="paused">Pausado</option>
                 </select>
                 <select wire:model.live="typeFilter" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
                     <option value="all">Todos os tipos</option>
-                    <option value="https">HTTPS</option>
                     <option value="http">HTTP</option>
                     <option value="ping">Ping</option>
                 </select>
@@ -40,49 +37,54 @@
                 </x-slot>
             </x-infrawatch.empty-state>
         @else
-            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                @foreach ($monitors as $monitor)
-                    <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-teal-200 hover:shadow-md">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0">
-                                <h2 class="truncate font-bold text-slate-950">{{ $monitor['name'] }}</h2>
-                                <p class="mt-1 truncate text-sm text-slate-500">{{ $monitor['target'] }}</p>
-                            </div>
-                            <x-infrawatch.status-badge :status="$monitor['status']" />
-                        </div>
-
-                        <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                                <dt class="text-slate-500">Tipo</dt>
-                                <dd class="font-semibold uppercase text-slate-900">{{ $monitor['type'] }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-slate-500">Uptime</dt>
-                                <dd class="font-semibold text-slate-900">{{ $monitor['uptime'] }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-slate-500">Resposta</dt>
-                                <dd class="font-semibold text-slate-900">{{ $monitor['response_ms'] ? $monitor['response_ms'].' ms' : '—' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-slate-500">Frequencia</dt>
-                                <dd class="font-semibold text-slate-900">{{ $monitor['frequency'] }}</dd>
-                            </div>
-                        </dl>
-
-                        <div class="mt-5 flex gap-2">
-                            <a href="{{ route('monitors.show', $monitor['id']) }}" class="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-                                Detalhes
-                            </a>
-                            <a href="{{ route('monitors.edit', $monitor['id']) }}" class="inline-flex flex-1 items-center justify-center rounded-lg bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-100">
-                                Editar
-                            </a>
-                        </div>
-                    </article>
-                @endforeach
+            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                        <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
+                            <tr>
+                                <th class="px-5 py-3 text-start">Monitor</th>
+                                <th class="px-5 py-3 text-start">Status</th>
+                                <th class="px-5 py-3 text-start">Tipo</th>
+                                <th class="px-5 py-3 text-start">Frequencia</th>
+                                <th class="px-5 py-3 text-start">Ultima resposta</th>
+                                <th class="px-5 py-3 text-end">Acoes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach ($monitors as $monitor)
+                                @php($latestLog = $monitor->latestLog)
+                                <tr>
+                                    <td class="px-5 py-4">
+                                        <div class="max-w-xs">
+                                            <a href="{{ route('monitors.show', $monitor) }}" class="font-bold text-slate-950 hover:text-teal-700">{{ $monitor->name }}</a>
+                                            <p class="mt-1 truncate text-slate-500">{{ $monitor->target }}</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <x-infrawatch.status-badge :status="$monitor->status" />
+                                    </td>
+                                    <td class="px-5 py-4 font-semibold uppercase text-slate-700">{{ $monitor->type }}</td>
+                                    <td class="px-5 py-4 text-slate-600">{{ $monitor->frequency }}</td>
+                                    <td class="px-5 py-4 text-slate-600">{{ $latestLog?->response_time_ms ? $latestLog->response_time_ms.' ms' : '—' }}</td>
+                                    <td class="px-5 py-4">
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ route('monitors.edit', $monitor) }}" class="inline-flex items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                                                Editar
+                                            </a>
+                                            <button type="button" wire:click="togglePause({{ $monitor->id }})" class="inline-flex items-center justify-center rounded-lg bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-100">
+                                                {{ $monitor->status === 'paused' ? 'Ativar' : 'Pausar' }}
+                                            </button>
+                                            <button type="button" wire:click="delete({{ $monitor->id }})" wire:confirm="Excluir este monitor?" class="inline-flex items-center justify-center rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100">
+                                                Excluir
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         @endif
-
-        <p class="text-center text-xs text-slate-400">Dados de demonstracao — integracao com PostgreSQL na Etapa 2 do roadmap.</p>
     </div>
 </div>

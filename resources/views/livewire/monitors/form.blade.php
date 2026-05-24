@@ -2,7 +2,7 @@
     <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         @if ($saved)
             <div class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
-                Configuracao salva em modo demonstracao. A persistencia no banco sera adicionada na Etapa 2.
+                Monitor salvo com sucesso.
             </div>
         @endif
 
@@ -23,9 +23,8 @@
                 <div>
                     <x-label for="type" value="Tipo de verificacao" />
                     <select id="type" wire:model="type" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
-                        <option value="https">HTTPS</option>
                         <option value="http">HTTP</option>
-                        <option value="ping">Ping (futuro)</option>
+                        <option value="ping">Ping</option>
                     </select>
                     <x-input-error for="type" class="mt-2" />
                 </div>
@@ -33,15 +32,15 @@
                 <div>
                     <x-label for="frequency" value="Frequencia" />
                     <select id="frequency" wire:model="frequency" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
-                        <option value="1">A cada 1 minuto</option>
-                        <option value="5">A cada 5 minutos</option>
+                        <option value="1m">A cada 1 minuto</option>
+                        <option value="5m">A cada 5 minutos</option>
                     </select>
                     <x-input-error for="frequency" class="mt-2" />
                 </div>
 
                 <div>
                     <x-label for="timeout" value="Timeout (segundos)" />
-                    <x-input id="timeout" type="number" min="5" max="60" class="mt-1 block w-full" wire:model="timeout" />
+                    <x-input id="timeout" type="number" min="1" max="60" class="mt-1 block w-full" wire:model="timeout" />
                     <x-input-error for="timeout" class="mt-2" />
                 </div>
 

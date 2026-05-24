@@ -1,6 +1,6 @@
 <?php
 
-use App\Support\MonitoringDemoData;
+use App\Models\Monitor;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,27 +23,21 @@ Route::middleware([
         ]);
     })->name('monitors.create');
 
-    Route::get('/monitors/{monitor}', function (string $monitor) {
-        $data = MonitoringDemoData::findMonitor($monitor);
-
-        if ($data === null) {
-            abort(404);
-        }
+    Route::get('/monitors/{monitor}', function (Monitor $monitor) {
+        abort_unless($monitor->user_id === auth()->id(), 404);
 
         return view('pages.monitors.show', [
-            'monitorId' => $monitor,
-            'monitorName' => $data['name'],
+            'monitorId' => $monitor->id,
+            'monitorName' => $monitor->name,
         ]);
     })->name('monitors.show');
 
-    Route::get('/monitors/{monitor}/edit', function (string $monitor) {
-        if (MonitoringDemoData::findMonitor($monitor) === null) {
-            abort(404);
-        }
+    Route::get('/monitors/{monitor}/edit', function (Monitor $monitor) {
+        abort_unless($monitor->user_id === auth()->id(), 404);
 
         return view('pages.monitors.form', [
             'isEditing' => true,
-            'monitorId' => $monitor,
+            'monitorId' => $monitor->id,
         ]);
     })->name('monitors.edit');
 

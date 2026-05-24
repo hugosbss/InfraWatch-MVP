@@ -2,20 +2,22 @@
 
 namespace App\Livewire\Monitors;
 
-use App\Support\MonitoringDemoData;
+use App\Models\Monitor;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Form extends Component
 {
-    public ?string $monitorId = null;
+    public ?int $monitorId = null;
 
     public string $name = '';
 
     public string $target = '';
 
-    public string $type = 'https';
+    public string $type = 'http';
 
-    public string $frequency = '5';
+    public string $frequency = '5m';
 
     public int $timeout = 10;
 
@@ -25,40 +27,69 @@ class Form extends Component
 
     public function mount(?string $monitor = null): void
     {
-        $this->monitorId = $monitor;
-
         if ($monitor === null) {
             return;
         }
 
-        $existing = MonitoringDemoData::findMonitor($monitor);
+        $existing = $this->findMonitor($monitor);
 
-        if ($existing === null) {
-            abort(404);
-        }
-
-        $this->name = $existing['name'];
-        $this->target = $existing['target'];
-        $this->type = $existing['type'];
-        $this->frequency = match ($existing['frequency']) {
-            '1 min' => '1',
-            default => '5',
-        };
-        $this->timeout = (int) $existing['timeout'];
-        $this->isActive = $existing['status'] !== 'paused';
+        $this->monitorId = $existing->id;
+        $this->name = $existing->name;
+        $this->target = $existing->target;
+        $this->type = $existing->type;
+        $this->frequency = $existing->frequency;
+        $this->timeout = $existing->timeout;
+        $this->isActive = $existing->status === 'active';
     }
 
     public function save(): void
     {
-        $this->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'target' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:http,https,ping'],
-            'frequency' => ['required', 'in:1,5'],
-            'timeout' => ['required', 'integer', 'min:5', 'max:60'],
-        ]);
+        $validated = $this->validate();
+
+        $validated['user_id'] = Auth::id();
+        $validated['status'] = $this->isActive ? 'active' : 'paused';
+
+        if ($this->monitorId !== null) {
+            $this->findMonitor((string) $this->monitorId)->update($validated);
+        } else {
+            Monitor::query()->create($validated);
+        }
 
         $this->saved = true;
+
+        $this->redirectRoute('monitors.index', navigate: true);
+    }
+
+    protected function rules(): array
+    {
+        $targetRules = $this->type === 'ping'
+            ? ['required', 'ip']
+            : ['required', 'url', 'regex:/^https?:\/\/[^\\s]+$/i'];
+
+        return [
+            'name' => ['required', 'string', 'max:120'],
+            'target' => [...$targetRules, 'max:255'],
+            'type' => ['required', Rule::in(['http', 'ping'])],
+            'frequency' => ['required', Rule::in(['1m', '5m'])],
+            'timeout' => ['required', 'integer', 'min:1', 'max:60'],
+            'isActive' => ['boolean'],
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'target.url' => 'Informe uma URL valida com http:// ou https://.',
+            'target.regex' => 'A URL precisa iniciar com http:// ou https://.',
+            'target.ip' => 'Informe um IP valido para monitores de ping.',
+        ];
+    }
+
+    private function findMonitor(string $monitor): Monitor
+    {
+        return Monitor::query()
+            ->where('user_id', Auth::id())
+            ->findOrFail($monitor);
     }
 
     public function render()

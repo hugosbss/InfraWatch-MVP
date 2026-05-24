@@ -2,6 +2,7 @@
 
 @php
     [$label, $classes] = match ($status) {
+        'active' => ['ativo', 'bg-emerald-50 text-emerald-700'],
         'online' => ['online', 'bg-emerald-50 text-emerald-700'],
         'offline' => ['offline', 'bg-rose-50 text-rose-700'],
         'degraded' => ['degradado', 'bg-amber-50 text-amber-700'],
