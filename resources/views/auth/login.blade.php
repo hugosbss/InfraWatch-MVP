@@ -39,12 +39,18 @@
 
             <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
-                    <a class="rounded-md text-sm font-medium text-slate-600 underline hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" href="{{ route('password.request') }}">
+                    <a class="rounded-md text-sm font-medium text-slate-600 underline hover:text-slate-900 focus:outline-none focus:ring-2 px-1 focus:ring-teal-500 focus:ring-offset-2" href="{{ route('password.request') }}">
                         {{ __('Esqueceu a senha?') }}
                     </a>
                 @endif
 
-                <x-button class="ms-4">
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white/80 px-1 py-3 text-sm font-bold text-slate-800 shadow-sm transition hover:bg-white">
+                        Criar conta
+                    </a>
+                @endif
+
+                <x-button class="ms-1">
                     {{ __('Entrar') }}
                 </x-button>
             </div>

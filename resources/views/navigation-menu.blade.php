@@ -25,12 +25,8 @@
 
             <div class="hidden sm:flex sm:items-center sm:gap-4">
                 <a href="{{ route('monitors.create') }}" class="hidden rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 lg:inline-flex">
-                    Novo monitor
+                    CADASTRAR
                 </a>
-
-                <div class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                    Sistema online
-                </div>
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">

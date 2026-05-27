@@ -13,9 +13,11 @@
             <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
                 <!-- Profile Photo File Input -->
                 <input type="file" id="photo" class="hidden"
+                            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                             wire:model.live="photo"
                             x-ref="photo"
                             x-on:change="
+                                    if (! $refs.photo.files.length) return;
                                     photoName = $refs.photo.files[0].name;
                                     const reader = new FileReader();
                                     reader.onload = (e) => {
@@ -31,7 +33,6 @@
                     <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="size-20 rounded-full object-cover ring-4 ring-teal-50">
                     <div>
                         <p class="text-sm font-semibold text-slate-900">{{ $this->user->name }}</p>
-                        <p class="text-sm text-slate-500">A imagem aparece pequena e redonda no topo do sistema.</p>
                     </div>
                 </div>
 
