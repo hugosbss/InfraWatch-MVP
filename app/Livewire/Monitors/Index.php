@@ -28,8 +28,8 @@ class Index extends Component
     public function render()
     {
         $monitors = Monitor::query()
-            ->where('user_id', Auth::id())
-            ->with('latestLog')
+            ->visibleToTeam(Auth::user()->currentTeam)
+            ->with(['latestLog', 'user'])
             ->when($this->search !== '', function ($query) {
                 $query->where(function ($query) {
                     $query->where('name', 'like', '%'.$this->search.'%')
@@ -49,7 +49,7 @@ class Index extends Component
     private function findMonitor(int $monitorId): Monitor
     {
         return Monitor::query()
-            ->where('user_id', Auth::id())
+            ->visibleToTeam(Auth::user()->currentTeam)
             ->findOrFail($monitorId);
     }
 

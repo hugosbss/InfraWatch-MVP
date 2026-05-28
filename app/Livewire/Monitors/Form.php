@@ -48,6 +48,7 @@ class Form extends Component
         $validated = $this->validate();
 
         $validated['user_id'] = Auth::id();
+        $validated['team_id'] = Auth::user()->currentTeam->id;
         $validated['status'] = $this->isActive
             ? MonitorStatus::Active
             : MonitorStatus::Paused;
@@ -91,7 +92,7 @@ class Form extends Component
     private function findMonitor(string $monitor): Monitor
     {
         return Monitor::query()
-            ->where('user_id', Auth::id())
+            ->visibleToTeam(Auth::user()->currentTeam)
             ->findOrFail($monitor);
     }
 

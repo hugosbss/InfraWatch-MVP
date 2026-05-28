@@ -13,13 +13,13 @@ class Index extends Component
 
     public function render()
     {
-        $userId = Auth::id();
+        $team = Auth::user()->currentTeam;
 
         $baseQuery = Incident::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId));
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team));
 
         $incidents = (clone $baseQuery)
-            ->with('monitor')
+            ->with(['monitor', 'monitor.user'])
             ->when($this->hasStatusFilter(), fn ($query) => $query->where('status', $this->statusFilter))
             ->latest('started_at')
             ->get();

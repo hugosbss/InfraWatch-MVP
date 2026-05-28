@@ -24,7 +24,7 @@ Route::middleware([
     })->name('monitors.create');
 
     Route::get('/monitors/{monitor}', function (Monitor $monitor) {
-        abort_unless($monitor->user_id === auth()->id(), 404);
+        abort_unless(in_array($monitor->user_id, auth()->user()->currentTeam->visibleMonitorOwnerIds(), true), 404);
 
         return view('pages.monitors.show', [
             'monitorId' => $monitor->id,
@@ -33,7 +33,7 @@ Route::middleware([
     })->name('monitors.show');
 
     Route::get('/monitors/{monitor}/edit', function (Monitor $monitor) {
-        abort_unless($monitor->user_id === auth()->id(), 404);
+        abort_unless(in_array($monitor->user_id, auth()->user()->currentTeam->visibleMonitorOwnerIds(), true), 404);
 
         return view('pages.monitors.form', [
             'isEditing' => true,

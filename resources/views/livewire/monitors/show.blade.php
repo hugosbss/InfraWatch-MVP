@@ -12,6 +12,7 @@
                         <span class="rounded-full bg-slate-100 px-3 py-1 uppercase">{{ $monitor->type }}</span>
                         <span class="rounded-full bg-slate-100 px-3 py-1">Frequencia: {{ $monitor->frequency }}</span>
                         <span class="rounded-full bg-slate-100 px-3 py-1">Timeout: {{ $monitor->timeout }}s</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1">Criado por: {{ $monitor->user?->name ?? '—' }}</span>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">

@@ -28,6 +28,49 @@
                     CADASTRAR
                 </a>
 
+                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
+                    <x-dropdown align="right" width="60">
+                        <x-slot name="trigger">
+                            <button type="button" class="inline-flex max-w-48 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+                                <span class="truncate">{{ Auth::user()->currentTeam->name }}</span>
+                                <svg class="size-4 shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                                </svg>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <div class="w-60">
+                                <div class="px-4 py-2 text-xs font-semibold uppercase text-slate-400">
+                                    Equipe
+                                </div>
+
+                                <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
+                                    Configurar equipe
+                                </x-dropdown-link>
+
+                                @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+                                    <x-dropdown-link href="{{ route('teams.create') }}">
+                                        Criar nova equipe
+                                    </x-dropdown-link>
+                                @endcan
+
+                                @if (Auth::user()->allTeams()->count() > 1)
+                                    <div class="border-t border-slate-100"></div>
+
+                                    <div class="px-4 py-2 text-xs font-semibold uppercase text-slate-400">
+                                        Alternar equipe
+                                    </div>
+
+                                    @foreach (Auth::user()->allTeams() as $team)
+                                        <x-switchable-team :team="$team" />
+                                    @endforeach
+                                @endif
+                            </div>
+                        </x-slot>
+                    </x-dropdown>
+                @endif
+
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1 pe-3 ps-1 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
@@ -107,6 +150,36 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
+                    <div class="px-4 py-2 text-xs font-semibold uppercase text-slate-400">
+                        Equipe atual: {{ Auth::user()->currentTeam->name }}
+                    </div>
+
+                    <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
+                        Configurar equipe
+                    </x-responsive-nav-link>
+
+                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+                        <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
+                            Criar nova equipe
+                        </x-responsive-nav-link>
+                    @endcan
+
+                    @if (Auth::user()->allTeams()->count() > 1)
+                        <div class="border-t border-slate-200"></div>
+
+                        <div class="px-4 py-2 text-xs font-semibold uppercase text-slate-400">
+                            Alternar equipe
+                        </div>
+
+                        @foreach (Auth::user()->allTeams() as $team)
+                            <x-switchable-team :team="$team" component="responsive-nav-link" />
+                        @endforeach
+                    @endif
+
+                    <div class="border-t border-slate-200"></div>
+                @endif
+
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                     Perfil
                 </x-responsive-nav-link>

@@ -45,6 +45,7 @@
                                 <th class="px-5 py-3 text-start">Monitor</th>
                                 <th class="px-5 py-3 text-start">Status</th>
                                 <th class="px-5 py-3 text-start">Tipo</th>
+                                <th class="px-5 py-3 text-start">Criado por</th>
                                 <th class="px-5 py-3 text-start">Frequencia</th>
                                 <th class="px-5 py-3 text-start">Ultima resposta</th>
                                 <th class="px-5 py-3 text-end">Acoes</th>
@@ -64,6 +65,7 @@
                                         <x-infrawatch.status-badge :status="$monitor->status" />
                                     </td>
                                     <td class="px-5 py-4 font-semibold uppercase text-slate-700">{{ $monitor->type }}</td>
+                                    <td class="px-5 py-4 text-slate-600">{{ $monitor->user?->name ?? '—' }}</td>
                                     <td class="px-5 py-4 text-slate-600">{{ $monitor->frequency }}</td>
                                     <td class="px-5 py-4 text-slate-600">{{ $latestLog?->response_time_ms ? $latestLog->response_time_ms.' ms' : '—' }}</td>
                                     <td class="px-5 py-4">

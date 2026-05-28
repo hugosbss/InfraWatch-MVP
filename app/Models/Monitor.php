@@ -16,6 +16,7 @@ class Monitor extends Model
 
     protected $fillable = [
         'user_id',
+        'team_id',
         'name',
         'target',
         'type',
@@ -40,6 +41,11 @@ class Monitor extends Model
     public function scopeHttp(Builder $query): void
     {
         $query->where('type', 'http');
+    }
+
+    public function scopeVisibleToTeam(Builder $query, Team $team): void
+    {
+        $query->whereIn('user_id', $team->visibleMonitorOwnerIds());
     }
 
     public function isActive(): bool
@@ -83,6 +89,11 @@ class Monitor extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
     }
 
     public function logs(): HasMany

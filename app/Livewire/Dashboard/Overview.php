@@ -13,41 +13,41 @@ class Overview extends Component
 {
     public function render()
     {
-        $userId = Auth::id();
+        $team = Auth::user()->currentTeam;
 
         $allMonitors = Monitor::query()
-            ->where('user_id', $userId)
-            ->with('latestLog')
+            ->visibleToTeam($team)
+            ->with(['latestLog', 'user'])
             ->latest()
             ->get();
 
         $monitors = $allMonitors->take(8);
 
         $incidents = Incident::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId))
-            ->with('monitor')
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team))
+            ->with(['monitor', 'monitor.user'])
             ->latest('started_at')
             ->limit(3)
             ->get();
 
         $checks = MonitorLog::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team))
             ->with('monitor')
             ->latest('checked_at')
             ->limit(6)
             ->get();
 
         $totalChecks = MonitorLog::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team))
             ->count();
 
         $upChecks = MonitorLog::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team))
             ->where('is_up', true)
             ->count();
 
         $averageLatency = MonitorLog::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team))
             ->whereNotNull('response_time_ms')
             ->avg('response_time_ms');
 
@@ -56,7 +56,7 @@ class Overview extends Component
             ->count();
 
         $openIncidents = Incident::query()
-            ->whereHas('monitor', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('monitor', fn ($query) => $query->visibleToTeam($team))
             ->where('status', IncidentStatus::Open->value)
             ->count();
 

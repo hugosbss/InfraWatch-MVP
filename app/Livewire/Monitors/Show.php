@@ -21,7 +21,8 @@ class Show extends Component
     public function mount(string $monitor): void
     {
         $this->monitorModel = Monitor::query()
-            ->where('user_id', Auth::id())
+            ->visibleToTeam(Auth::user()->currentTeam)
+            ->with('user')
             ->findOrFail($monitor);
     }
 

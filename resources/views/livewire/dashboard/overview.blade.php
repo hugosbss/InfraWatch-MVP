@@ -35,6 +35,7 @@
                                     <td class="px-5 py-4">
                                         <a href="{{ route('monitors.show', $monitor) }}" class="font-semibold text-slate-900 hover:text-teal-700">{{ $monitor->name }}</a>
                                         <p class="mt-0.5 truncate text-xs text-slate-500">{{ $monitor->target }}</p>
+                                        <p class="mt-0.5 truncate text-xs text-slate-400">Criado por: {{ $monitor->user?->name ?? '—' }}</p>
                                     </td>
                                     <td class="px-5 py-4"><x-infrawatch.status-badge :status="$monitor->operationalStatus()" /></td>
                                     <td class="px-5 py-4 text-slate-600">{{ $monitor->latestLog?->response_time_ms ? $monitor->latestLog->response_time_ms.' ms' : '—' }}</td>

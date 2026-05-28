@@ -31,3 +31,9 @@ package-lock.json
 package.json
 .npmrc
 /tests
+
+SMTP.md
+DOC.md
+InfraWatch-Laravel.MD
+JOBS_E_QUEUES.md
+roadmap.MD

@@ -42,6 +42,7 @@
                         <tr>
                             <th class="px-5 py-3 text-start">ID</th>
                             <th class="px-5 py-3 text-start">Monitor</th>
+                            <th class="px-5 py-3 text-start">Criado por</th>
                             <th class="px-5 py-3 text-start">Status</th>
                             <th class="px-5 py-3 text-start">Inicio</th>
                             <th class="px-5 py-3 text-start">Duracao</th>
@@ -56,6 +57,7 @@
                                     <p class="font-semibold text-slate-950">{{ $incident->monitor->name }}</p>
                                     <p class="mt-0.5 text-xs text-slate-500">{{ $incident->monitor->target }}</p>
                                 </td>
+                                <td class="px-5 py-4 text-slate-600">{{ $incident->monitor->user?->name ?? '—' }}</td>
                                 <td class="px-5 py-4"><x-infrawatch.status-badge :status="$incident->status" /></td>
                                 <td class="px-5 py-4 text-slate-600">{{ $incident->started_at->format('d/m/Y H:i') }}</td>
                                 <td class="px-5 py-4 text-slate-600">{{ $incident->durationLabel() }}</td>
