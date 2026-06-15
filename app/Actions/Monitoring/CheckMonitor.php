@@ -2,6 +2,7 @@
 
 namespace App\Actions\Monitoring;
 
+use App\Actions\Alerts\DispatchIncidentAlerts;
 use App\Enums\IncidentStatus;
 use App\Models\Incident;
 use App\Models\Monitor;
@@ -11,6 +12,8 @@ use Throwable;
 class CheckMonitor
 {
     private const FAILURE_THRESHOLD = 3;
+
+    public function __construct(private readonly DispatchIncidentAlerts $alerts) {}
 
     public function __invoke(Monitor $monitor): void
     {
@@ -65,15 +68,23 @@ class CheckMonitor
             return;
         }
 
-        if ($openIncident || ! $this->hasConfirmedFailure($monitor)) {
+        if ($openIncident) {
+            $this->alerts->offline($openIncident);
+
             return;
         }
 
-        $monitor->incidents()->create([
+        if (! $this->hasConfirmedFailure($monitor)) {
+            return;
+        }
+
+        $incident = $monitor->incidents()->create([
             'started_at' => now(),
             'error_message' => $result['error_message'],
             'status' => IncidentStatus::Open,
         ]);
+
+        $this->alerts->offline($incident);
     }
 
     private function hasConfirmedFailure(Monitor $monitor): bool
@@ -100,6 +111,8 @@ class CheckMonitor
             'duration_seconds' => $incident->started_at->diffInSeconds($endedAt),
             'status' => IncidentStatus::Resolved,
         ]);
+
+        $this->alerts->recovered($incident->refresh());
     }
 
     private function elapsedMs(int $startedAt): int

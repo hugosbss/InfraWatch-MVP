@@ -1,23 +1,39 @@
-@component('mail::message')
-{{ __('You have been invited to join the :team team!', ['team' => $invitation->team->name]) }}
+@php
+    $team = $invitation->team;
+@endphp
+
+<x-mail::message>
+# InfraWatch
+
+## Convite para equipe
+
+Voce recebeu um convite para participar da equipe **{{ $team->name }}** no InfraWatch.
+
+<x-mail::panel>
+**Acesso colaborativo**
+
+| Campo | Detalhe |
+| :--- | :--- |
+| Equipe | {{ $team->name }} |
+| Enviado para | {{ $invitation->email }} |
+| Produto | {{ config('app.name', 'InfraWatch') }} |
+</x-mail::panel>
 
 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::registration()))
-{{ __('If you do not have an account, you may create one by clicking the button below. After creating an account, you may click the invitation acceptance button in this email to accept the team invitation:') }}
-
-@component('mail::button', ['url' => route('register')])
-{{ __('Create Account') }}
-@endcomponent
-
-{{ __('If you already have an account, you may accept this invitation by clicking the button below:') }}
-
+Se voce ainda nao tem uma conta, crie seu cadastro primeiro. Depois volte neste e-mail e aceite o convite da equipe.
 @else
-{{ __('You may accept this invitation by clicking the button below:') }}
+Para entrar na equipe, aceite o convite pelo botao abaixo.
 @endif
 
+<x-mail::button :url="$acceptUrl" color="primary">
+Aceitar convite
+</x-mail::button>
 
-@component('mail::button', ['url' => $acceptUrl])
-{{ __('Accept Invitation') }}
-@endcomponent
+@if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::registration()))
+<x-mail::button :url="route('register')" color="primary">
+Criar conta
+</x-mail::button>
+@endif
 
-{{ __('If you did not expect to receive an invitation to this team, you may discard this email.') }}
-@endcomponent
+Se voce nao esperava este convite, basta ignorar este e-mail.
+</x-mail::message>

@@ -24,7 +24,12 @@ class AlertChannels extends Component
     {
         $user = auth()->user();
 
-        $this->emailAddress = $user?->email ?? '';
+        $this->emailEnabled = (bool) ($user?->alert_email_enabled ?? true);
+        $this->emailAddress = $user?->alertEmailAddress() ?? '';
+        $this->telegramEnabled = (bool) ($user?->alert_telegram_enabled ?? false);
+        $this->telegramChatId = $user?->alert_telegram_chat_id ?? '';
+        $this->notifyOffline = (bool) ($user?->alert_notify_offline ?? true);
+        $this->notifyRecovery = (bool) ($user?->alert_notify_recovery ?? true);
     }
 
     public function save(): void
@@ -45,6 +50,15 @@ class AlertChannels extends Component
         }
 
         $this->validate($rules);
+
+        auth()->user()->forceFill([
+            'alert_email_enabled' => $this->emailEnabled,
+            'alert_email_address' => $this->emailEnabled ? $this->emailAddress : null,
+            'alert_telegram_enabled' => $this->telegramEnabled,
+            'alert_telegram_chat_id' => $this->telegramEnabled ? $this->telegramChatId : null,
+            'alert_notify_offline' => $this->notifyOffline,
+            'alert_notify_recovery' => $this->notifyRecovery,
+        ])->save();
 
         $this->saved = true;
     }

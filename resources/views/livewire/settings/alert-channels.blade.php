@@ -2,7 +2,7 @@
     <div class="mx-auto max-w-3xl space-y-6 px-4 sm:px-6 lg:px-8">
         @if ($saved)
             <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
-                Preferencias de alerta salvas em modo demonstracao.
+                Preferencias de alerta salvas.
             </div>
         @endif
 
@@ -11,7 +11,7 @@
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <h2 class="text-lg font-bold text-slate-950">Email</h2>
-                        <p class="mt-1 text-sm text-slate-500">Alertas de queda e recuperacao via Laravel Notifications.</p>
+                        <p class="mt-1 text-sm text-slate-500">Alertas de queda e recuperacao enviados pelo SMTP configurado.</p>
                     </div>
                     <label class="relative inline-flex cursor-pointer items-center">
                         <input type="checkbox" wire:model.live="emailEnabled" class="peer sr-only" />
@@ -45,7 +45,7 @@
                         <x-label for="telegramChatId" value="Chat ID do Telegram" />
                         <x-input id="telegramChatId" type="text" class="mt-1 block w-full" wire:model="telegramChatId" placeholder="Ex: -1001234567890" />
                         <x-input-error for="telegramChatId" class="mt-2" />
-                        <p class="mt-2 text-xs text-slate-500">O bot e o token serao configurados no backend na proxima etapa.</p>
+                        <p class="mt-2 text-xs text-slate-500">O backend ja guarda o chat ID para a futura integracao com o bot.</p>
                     </div>
                 @endif
             </section>

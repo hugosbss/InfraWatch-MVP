@@ -18,6 +18,10 @@ class Incident extends Model
         'duration_seconds',
         'error_message',
         'status',
+        'offline_email_sent_at',
+        'recovery_email_sent_at',
+        'offline_telegram_sent_at',
+        'recovery_telegram_sent_at',
     ];
 
     protected function casts(): array
@@ -27,6 +31,10 @@ class Incident extends Model
             'ended_at' => 'datetime',
             'duration_seconds' => 'integer',
             'status' => IncidentStatus::class,
+            'offline_email_sent_at' => 'datetime',
+            'recovery_email_sent_at' => 'datetime',
+            'offline_telegram_sent_at' => 'datetime',
+            'recovery_telegram_sent_at' => 'datetime',
         ];
     }
 

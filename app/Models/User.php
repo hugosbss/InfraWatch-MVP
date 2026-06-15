@@ -65,6 +65,10 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'alert_email_enabled' => 'boolean',
+            'alert_telegram_enabled' => 'boolean',
+            'alert_notify_offline' => 'boolean',
+            'alert_notify_recovery' => 'boolean',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
@@ -73,5 +77,10 @@ class User extends Authenticatable
     public function monitors(): HasMany
     {
         return $this->hasMany(Monitor::class);
+    }
+
+    public function alertEmailAddress(): string
+    {
+        return $this->alert_email_address ?: $this->email;
     }
 }
